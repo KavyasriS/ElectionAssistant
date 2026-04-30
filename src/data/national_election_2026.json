@@ -1,0 +1,181 @@
+{
+  "election_cycle": "2026 Assembly Elections",
+  "current_date": "2026-04-30",
+  "states": {
+    "WB": {
+      "name": "West Bengal",
+      "status": "Polling Completed",
+      "next_milestone": "Counting of Votes",
+      "date": "2026-05-04",
+      "details": "Polling for all phases successfully concluded on April 29. West Bengal recorded a massive 92.6% turnout in Phase 2, with an overall turnout of 92.9%. All EVMs are now sealed and stored in robust triple-layered security strongrooms.",
+      "counting_day": "2026-05-04",
+      "total_seats": 294,
+      "ruling_party": "All India Trinamool Congress (AITC)",
+      "previous_turnout": "81.6%",
+      "current_2026_turnout_estimate": "92.9% (Final Overall - Record High)",
+      "female_turnout_previous": "81.7%",
+      "male_turnout_previous": "81.5%",
+      "voter_demographics": "High rural participation, especially in districts like Birbhum and East Midnapore.",
+      "key_candidates": [
+        "Mamata Banerjee (AITC)",
+        "Suvendu Adhikari (BJP)",
+        "Meenakshi Mukherjee (CPI(M))"
+      ]
+    },
+    "TN": {
+      "name": "Tamil Nadu",
+      "status": "Polling Completed",
+      "next_milestone": "Counting of Votes",
+      "date": "2026-05-04",
+      "details": "Polling concluded with a historic 85.15% turnout, the highest in the state's election history. EVMs are secured in strongrooms with 24/7 CCTV and paramilitary guard. Counting begins at 8 AM on May 4.",
+      "counting_day": "2026-05-04",
+      "total_seats": 234,
+      "ruling_party": "Dravida Munnetra Kazhagam (DMK)",
+      "previous_turnout": "72.8%",
+      "urban_turnout": "66.2%",
+      "rural_turnout": "76.4%",
+      "current_2026_turnout_estimate": "85.15% (Final - Highest Ever)",
+      "high_turnout_notable": "84% observed in specific rural pockets of Dharmapuri and Karur.",
+      "key_candidates": [
+        "M.K. Stalin (DMK)",
+        "Edappadi K. Palaniswami (AIADMK)",
+        "K. Annamalai (BJP)",
+        "S. Seeman (NTK)",
+        "Thalapathy Vijay (TVK - Thamizhaga Vettri Kazhagam)"
+      ]
+    },
+    "Kerala": {
+      "name": "Kerala",
+      "status": "Polling Completed",
+      "next_milestone": "Counting of Votes",
+      "date": "2026-05-04",
+      "details": "Polling safely concluded with a final turnout of 73.9%. Electronic Voting Machines (EVMs) are sealed and stored in triple-layered security zones.",
+      "counting_day": "2026-05-04",
+      "total_seats": 140,
+      "ruling_party": "Communist Party of India (Marxist) [LDF]",
+      "previous_turnout": "74.06%",
+      "current_2026_turnout_estimate": "73.9% (Final)",
+      "key_candidates": [
+        "Pinarayi Vijayan (CPI(M))",
+        "V.D. Satheesan (INC)",
+        "K. Surendran (BJP)"
+      ]
+    },
+    "Assam": {
+      "name": "Assam",
+      "status": "Polling Completed",
+      "next_milestone": "Counting of Votes",
+      "date": "2026-05-04",
+      "details": "Polling concluded with a final turnout of 84%. VVPAT slips will be verified as per EC random sampling protocols on counting day.",
+      "counting_day": "2026-05-04",
+      "total_seats": 126,
+      "ruling_party": "Bharatiya Janata Party (BJP)",
+      "previous_turnout": "82.04%",
+      "current_2026_turnout_estimate": "84% (Final)",
+      "key_candidates": [
+        "Himanta Biswa Sarma (BJP)",
+        "Gaurav Gogoi (INC)",
+        "Badruddin Ajmal (AIUDF)"
+      ]
+    },
+    "Puducherry": {
+      "name": "Puducherry",
+      "status": "Polling Completed",
+      "next_milestone": "Counting of Votes",
+      "date": "2026-05-04",
+      "details": "Democratic exercise completed. Results will be declared on May 4.",
+      "counting_day": "2026-05-04",
+      "total_seats": 30,
+      "ruling_party": "All India N.R. Congress (AINRC)",
+      "previous_turnout": "81.64%",
+      "constituencies": {
+        "Puducherry": {
+          "total_candidates": 320,
+          "key_candidates": ["Samples from various parties including AINRC, DMK, BJP, AIADMK"],
+          "link": "https://affidavit.eci.gov.in/"
+        }
+      }
+    }
+  },
+  "sample_constituency_data": {
+    "Nandigram": {
+      "state": "West Bengal",
+      "status": "Polling Completed",
+      "phase": "2",
+      "date": "2026-04-29",
+      "notable_history": "Highly contested seat in 2021.",
+      "candidates": ["Suvendu Adhikari (BJP)", "Mamata Banerjee (AITC nominee)", "Meenakshi Mukherjee (CPI(M))"]
+    },
+    "Harlow": {
+      "state": "Assam",
+      "status": "Polling Concluded",
+      "turnout": "Approx 82.04%",
+      "constituency_type": "General",
+      "candidates": ["Dipanjan Das (BJP)", "Anjali Bora (INC)"]
+    },
+    "Dharmapuri": {
+      "state": "Tamil Nadu",
+      "status": "EVMs Secured",
+      "total_candidates": 15,
+      "notable": "Highest turnout district traditionally.",
+      "candidates": ["S.P. Venkateswaran (PMK)", "P. Palaniappan (AMMK)", "T.K.S. Elangovan (DMK)"]
+    },
+    "Majuli": {
+      "state": "Assam",
+      "status": "Polling Concluded",
+      "turnout": "80.5%",
+      "type": "ST reserved"
+    },
+    "Tollygunge": {
+      "state": "West Bengal",
+      "status": "Polling Completed",
+      "phase": "4",
+      "date": "2026-04-29",
+      "details": "Polling successfully concluded along with earlier phases on April 29.",
+      "candidates": ["Arup Biswas (AITC)", "Babul Supriyo (BJP)", "Debdut Ghosh (CPI(M))"]
+    },
+    "Thiruvananthapuram": {
+      "state": "Kerala",
+      "status": "Polling Completed",
+      "notable": "High urban voter awareness, historically high turnout."
+    },
+    "Dispur": {
+      "state": "Assam",
+      "status": "Polling Completed",
+      "details": "Capital region, high security during polls."
+    },
+    "Chennai North": {
+      "state": "Tamil Nadu",
+      "status": "EVMs Secured",
+      "previous_turnout": "65.5%"
+    }
+  },
+  "general_facts": {
+    "mla_vs_mp": {
+      "MLA": "Member of Legislative Assembly. Elected for State Governments. They work on state-specific issues like agriculture, state health, and police.",
+      "MP": "Member of Parliament. Elected for the National Government (Lok Sabha). They work on national issues like defense, railways, and foreign policy.",
+      "summary": "MLA = State Level, MP = National Level. In 2026, elections are for MLAs."
+    },
+    "home_voting": {
+      "eligibility": "Senior citizens (85+ years) and Persons with Disabilities (PwD) with 40% benchmark disability.",
+      "process": "Apply via Form 12D with the Booth Level Officer (BLO) within 5 days of election notification.",
+      "execution": "Two polling officials visit the voter's home with a postal ballot, ensuring complete secrecy.",
+      "safety": "The process is videographed and accompanied by security personnel and party representatives."
+    },
+    "evm_vvpat": "EVM is the electronic device used to record votes. VVPAT (Voter Verifiable Paper Audit Trail) is a connected machine that prints a paper slip showing your choice for 7 seconds before it drops into a sealed box. It allows you to verify that your vote went to the candidate you selected.",
+    "nota_info": "NOTA (None of the Above) is the last option on the EVM. It allows voters to register a 'no confidence' vote against all candidates in the constituency if they find none suitable.",
+    "constitutional_rights": "Article 324 of the Indian Constitution vests the power of superintendence, direction, and control of elections in the Election Commission of India.",
+    "edge_cases": {
+      "tendered_votes": "Under Section 49P, if a voter finds that someone else has already voted in their name, they can still cast a 'Tendered Vote' using a ballot paper after verifying their identity.",
+      "challenge_votes": "Under Section 49E, a polling agent can challenge a voter's identity by depositing a small fee. The Presiding Officer then conducts an immediate inquiry."
+    },
+    "neutrality_policy": "As a Digital Assistant of the Election Commission, I provide facts, schedules, and process information. I do not provide political predictions or opinions on who might win.",
+    "pro_tips": {
+      "postal_ballots": "Mainly for service voters and those on election duty. Senior citizens (85+) can now also opt for this via Form 12D.",
+      "booth_app": "The 'Voter Helpline App' can be used to find your exact booth, serial number in the roll, and and e-EPIC download.",
+      "security": "Central Armed Police Forces (CAPF) are deployed at 'Critical' booths to ensure free and fair polling.",
+      "counting_agents": "Each candidate can appoint counting agents to monitor the transparency of the counting process on May 4."
+    },
+    "election_commission": "Established in 1950, ECI is an autonomous constitutional authority responsible for administering election processes in India."
+  }
+}
