@@ -1,4 +1,4 @@
-# CDEO Civic Assistant (2026 Indian Assembly Elections)
+#  Civic Assistant (2026 Indian Assembly Elections)
 
 An authoritative, real-time digital assistant designed for the **2026 Indian Assembly Elections**. This application serves as the **Chief Digital Election Officer (CDEO)**, providing verified polling data, civic education, and a countdown to Counting Day.
 
