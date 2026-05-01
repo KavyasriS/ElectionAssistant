@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Send, User, Bot, Loader2, Info } from "lucide-react";
-import { GoogleGenAI } from "@google/genai";
-import { motion, AnimatePresence } from "motion/react";
+import { Send, Loader2 } from "lucide-react";
+import { motion } from "motion/react";
 
 const SYSTEM_PROMPT = `You are the Chief Digital Election Officer (CDEO). 
 Mission: Provide authoritative 2026 Assembly Election stats and civic guidance. 
@@ -52,48 +51,25 @@ export default function CivicAssistant() {
     setLoading(true);
 
     try {
-      // Fetch knowledge base and 2026 schedule for context
-      const [generalDataRes, scheduleDataRes] = await Promise.all([
-        fetch("/api/election-data"),
-        fetch("/api/election-schedule-2026")
-      ]);
-      
-      const generalData = await generalDataRes.json();
-      const scheduleData = await scheduleDataRes.json();
-      
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-      const streamResponse = await ai.models.generateContentStream({
-        model: "gemini-3-flash-preview",
-        contents: [
-          {
-            role: "user",
-            parts: [{ text: `TODAY'S DATE: April 30, 2026\nCONTEXT DATA: ${JSON.stringify({ ...generalData, ...scheduleData })}\n\nUSER QUESTION: ${userMessage}` }]
-          }
-        ],
-        config: {
-          systemInstruction: SYSTEM_PROMPT,
-          temperature: 0.1,
-        }
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: userMessage }),
       });
 
-      // Add an empty bot message to start streaming into
-      setMessages(prev => [...prev, { role: "bot", text: "" }]);
-      
-      let fullText = "";
-      for await (const chunk of streamResponse) {
-        const chunkText = chunk.text;
-        if (chunkText) {
-          fullText += chunkText;
-          setMessages(prev => {
-            const newMessages = [...prev];
-            newMessages[newMessages.length - 1].text = fullText;
-            return newMessages;
-          });
-        }
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to fetch AI response");
       }
-    } catch (error) {
+
+      const data = await response.json();
+      setMessages(prev => [...prev, { role: "bot", text: data.text }]);
+    } catch (error: any) {
       console.error("Chat Error:", error);
-      setMessages(prev => [...prev, { role: "bot", text: "I encountered an error. Please ensure your query is related to the election process." }]);
+      setMessages(prev => [...prev, { 
+        role: "bot", 
+        text: `I encountered an error: ${error.message}. Please ensure the GEMINI_API_KEY is correctly set in the environment variables.` 
+      }]);
     } finally {
       setLoading(false);
     }

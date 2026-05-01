@@ -13,6 +13,7 @@ import {
   ClipboardList,
   UserSearch
 } from "lucide-react";
+import { ELECTION_DATA_2026 } from "../data/election_data";
 
 interface Step {
   icon: React.ReactNode;
@@ -84,15 +85,9 @@ const checklistItems = [
 ];
 
 export default function VoterJourney() {
-  const [schedule, setSchedule] = useState<any>(null);
+  const [schedule] = useState<any>(ELECTION_DATA_2026);
   const [selectedState, setSelectedState] = useState<string>("");
   const [isChecklistOpen, setIsChecklistOpen] = useState(false);
-
-  useEffect(() => {
-    fetch("/api/election-schedule-2026")
-      .then(res => res.json())
-      .then(data => setSchedule(data));
-  }, []);
 
   return (
     <div className="p-8 max-w-6xl mx-auto space-y-12">
@@ -134,16 +129,27 @@ export default function VoterJourney() {
             <p className="text-slate-300 text-sm mb-6 leading-relaxed">
               Real-time synchronization with the 2026 Assembly Election cycle. Select your state to see upcoming milestones.
             </p>
-            <select 
-              value={selectedState}
-              onChange={(e) => setSelectedState(e.target.value)}
-              className="bg-brand-navy-light text-white border border-white/20 p-3 rounded-xl w-full focus:ring-2 focus:ring-brand-amber outline-none cursor-pointer"
-            >
-              <option value="">Select your State...</option>
-              {schedule && Object.entries(schedule.states).map(([code, details]: any) => (
-                <option key={code} value={code}>{details.name}</option>
-              ))}
-            </select>
+            <div className="relative group">
+              <select 
+                value={selectedState}
+                onChange={(e) => setSelectedState(e.target.value)}
+                className="w-full bg-white text-slate-900 border-2 border-slate-100 p-4 rounded-2xl shadow-sm focus:ring-4 focus:ring-brand-amber/30 focus:border-brand-amber outline-none cursor-pointer transition-all hover:bg-slate-50 font-medium text-sm"
+              >
+                <option value="" disabled>Choose your State/UT...</option>
+                <option value="">-- All Regions --</option>
+                {schedule && schedule.states && Object.entries(schedule.states).map(([code, details]: any) => (
+                  <option key={code} value={code} className="py-2">
+                    {details.name}
+                  </option>
+                ))}
+              </select>
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                <ChevronRight className="rotate-90" size={18} />
+              </div>
+            </div>
+            {(!schedule || !schedule.states) && (
+              <p className="text-[10px] text-red-400 mt-2">Error: Election database not reachable.</p>
+            )}
           </div>
 
           <AnimatePresence mode="wait">
