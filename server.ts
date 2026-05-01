@@ -2,7 +2,7 @@ import express from "express";
 import { createServer as createViteServer } from "vite";
 import path from "path";
 import fs from "fs";
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenerativeAI } from "@google/genai";
 import dotenv from "dotenv";
 import { ELECTION_DATA_2026 } from "./src/data/election_data";
 
@@ -43,26 +43,25 @@ async function startServer() {
     }
 
     try {
-      const ai = new GoogleGenAI({ apiKey });
+      const genAI = new GoogleGenerativeAI(apiKey);
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
       
-      const result = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
-        contents: [
-          {
-            role: "user",
-            parts: [{ text: `${SYSTEM_PROMPT}\n\nTODAY'S DATE: April 30, 2026\nCONTEXT DATA: ${JSON.stringify(ELECTION_DATA_2026)}\n\nUSER QUESTION: ${message}` }]
-          }
-        ]
-      });
+      const prompt = `${SYSTEM_PROMPT}\n\nTODAY'S DATE: April 30, 2026\nCONTEXT DATA: ${JSON.stringify(ELECTION_DATA_2026)}\n\nUSER QUESTION: ${message}`;
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      const text = response.text();
 
-      if (!result || !result.text) {
-        throw new Error("AI returned an empty response.");
+      if (!text) {
+        throw new Error("AI returned an empty or invalid response.");
       }
 
-      res.json({ text: result.text });
+      res.json({ text });
     } catch (error: any) {
-      console.error("Gemini Error:", error);
-      res.status(500).json({ error: `AI_ERROR: ${error.message || "Failed to fetch AI response."}` });
+      console.error("Gemini Server Error:", error);
+      res.status(500).json({ 
+        error: `GEMINI_SERVICE_ERROR: ${error.message || "Unknown AI error"}`,
+        details: error.toString()
+      });
     }
   });
 
