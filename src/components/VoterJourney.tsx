@@ -133,19 +133,15 @@ export default function VoterJourney() {
               <select 
                 value={selectedState}
                 onChange={(e) => setSelectedState(e.target.value)}
-                className="w-full bg-white text-slate-900 border-2 border-slate-100 p-4 rounded-2xl shadow-sm focus:ring-4 focus:ring-brand-amber/30 focus:border-brand-amber outline-none cursor-pointer transition-all hover:bg-slate-50 font-medium text-sm"
+                className="w-full bg-white text-slate-900 border border-slate-200 p-4 rounded-xl shadow-sm focus:ring-2 focus:ring-brand-amber outline-none cursor-pointer transition-all hover:bg-slate-50 font-medium text-sm"
               >
-                <option value="" disabled>Choose your State/UT...</option>
-                <option value="">-- All Regions --</option>
+                <option value="">Select your State...</option>
                 {schedule && schedule.states && Object.entries(schedule.states).map(([code, details]: any) => (
-                  <option key={code} value={code} className="py-2">
+                  <option key={code} value={code}>
                     {details.name}
                   </option>
                 ))}
               </select>
-              <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                <ChevronRight className="rotate-90" size={18} />
-              </div>
             </div>
             {(!schedule || !schedule.states) && (
               <p className="text-[10px] text-red-400 mt-2">Error: Election database not reachable.</p>

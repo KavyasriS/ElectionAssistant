@@ -4,6 +4,7 @@ import path from "path";
 import fs from "fs";
 import { GoogleGenAI } from "@google/genai";
 import dotenv from "dotenv";
+import { ELECTION_DATA_2026 } from "./src/data/election_data";
 
 dotenv.config();
 
@@ -46,15 +47,12 @@ async function startServer() {
     try {
       const ai = new GoogleGenAI({ apiKey });
       
-      const dataPath = path.join(process.cwd(), "src/data/national_election_2026.json");
-      const electionData = JSON.parse(fs.readFileSync(dataPath, "utf8"));
-
       const result = await ai.models.generateContent({
         model: "gemini-1.5-flash",
         contents: [
           {
             role: "user",
-            parts: [{ text: `${SYSTEM_PROMPT}\n\nTODAY'S DATE: April 30, 2026\nCONTEXT DATA: ${JSON.stringify(electionData)}\n\nUSER QUESTION: ${message}` }]
+            parts: [{ text: `${SYSTEM_PROMPT}\n\nTODAY'S DATE: April 30, 2026\nCONTEXT DATA: ${JSON.stringify(ELECTION_DATA_2026)}\n\nUSER QUESTION: ${message}` }]
           }
         ]
       });
