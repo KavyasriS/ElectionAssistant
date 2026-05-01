@@ -37,39 +37,32 @@ async function startServer() {
   app.post("/api/chat", async (req, res) => {
     try {
       const { message } = req.body;
-      const apiKey = process.env.GEMINI_API_KEY;
+      const apiKey = (process.env.GEMINI_API_KEY || "").trim();
 
-      if (!apiKey) {
-        console.error("Gemini API Key is missing in process.env");
+      if (!apiKey || apiKey === "") {
         return res.status(500).json({ 
-          error: "CONFIGURATION_ERROR", 
-          message: "Gemini API Key is not configured on the server." 
+          error: "MISSING_API_KEY", 
+          message: "API Key is missing in server environment." 
         });
       }
 
       const genAI = new GoogleGenerativeAI(apiKey);
       const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
       
-      const stateSummary = Object.values(ELECTION_DATA_2026.states).map((s: any) => 
-        `${s.name}: ${s.status}`
-      ).join("\n");
-      
-      const fullPrompt = `${SYSTEM_PROMPT}\n\nSUMMARY DATA:\n${stateSummary}\n\nUSER QUESTION: ${message}`;
+      const fullPrompt = `${SYSTEM_PROMPT}\n\nUSER QUESTION: ${message}`;
       
       const result = await model.generateContent(fullPrompt);
       const response = await result.response;
       const text = response.text();
 
-      if (!text) {
-        throw new Error("Empty response from AI model.");
-      }
+      if (!text) throw new Error("EMPTY_AI_RESPONSE");
 
       return res.json({ text });
     } catch (error: any) {
       console.error("Gemini Server Error:", error);
       return res.status(500).json({ 
-        error: "AI_SERVICE_ERROR",
-        message: error.message || "Failed to fetch AI response."
+        error: "AI_ERROR",
+        message: error.message || "Failed to process AI request"
       });
     }
   });

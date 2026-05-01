@@ -50,21 +50,21 @@ export default function CivicAssistant() {
       }
 
       if (!response.ok) {
-        throw new Error(data.error || data.message || `HTTP_ERROR: ${response.status}`);
+        // Log detailed error from server
+        console.error("Server error data:", data);
+        const errorMsg = data.message || data.error || `HTTP ${response.status}: ${response.statusText}`;
+        throw new Error(errorMsg);
       }
 
       setMessages(prev => [...prev, { role: "bot", text: data.text }]);
     } catch (error: any) {
-      console.error("Chat Error:", error);
-      let displayError = error.message;
-
-      if (displayError.includes("MISSING_API_KEY")) {
-        displayError = "Gemini API Key is missing on the server. Please check your Environment Variables in the host dashboard.";
-      }
+      console.error("Chat Interaction Failure:", error);
+      
+      const displayError = error.message;
 
       setMessages(prev => [...prev, { 
         role: "bot", 
-        text: `I encountered an error: ${displayError}` 
+        text: `Diagnostic Error: ${displayError}\n\n(Session: ${new Date().toLocaleTimeString()})` 
       }]);
     } finally {
       setLoading(false);
