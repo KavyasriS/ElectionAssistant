@@ -2,7 +2,7 @@ import express from "express";
 import { createServer as createViteServer } from "vite";
 import path from "path";
 import fs from "fs";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 import dotenv from "dotenv";
 import { ELECTION_DATA_2026 } from "./src/data/election_data";
 
@@ -46,26 +46,17 @@ async function startServer() {
         });
       }
 
-      const genAI = new GoogleGenerativeAI(apiKey);
-      // Explicitly using v1 instead of v1beta to avoid 404s
-      const model = genAI.getGenerativeModel(
-        { model: "gemini-1.5-flash" },
-        { apiVersion: 'v1' }
-      );
+      const ai = new GoogleGenAI({ apiKey });
       
-      const fullPrompt = `${SYSTEM_PROMPT}\n\nUSER QUESTION: ${message}`;
+      const response = await ai.models.generateContent({
+        model: "gemini-3-flash-preview",
+        contents: message,
+        config: {
+          systemInstruction: SYSTEM_PROMPT
+        }
+      });
       
-      let result;
-      try {
-        result = await model.generateContent(fullPrompt);
-      } catch (err: any) {
-        console.warn("Flash model 404 or failure, falling back to Pro...");
-        const fallbackModel = genAI.getGenerativeModel({ model: "gemini-1.5-pro" }, { apiVersion: 'v1' });
-        result = await fallbackModel.generateContent(fullPrompt);
-      }
-      
-      const response = await result.response;
-      const text = response.text();
+      const text = response.text;
 
       if (!text) return res.status(500).json({ error: "AI_EMPTY", message: "AI returned empty text." });
 

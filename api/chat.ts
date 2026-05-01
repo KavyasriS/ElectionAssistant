@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 
 const ELECTION_DATA_2026 = {
   "WB": "West Bengal: 92.9% turnout, results May 4.",
@@ -9,6 +9,8 @@ const ELECTION_DATA_2026 = {
 
 const SYSTEM_PROMPT = `You are the Chief Digital Election Officer. Mission: Provide 2026 election stats. 
 Date: April 30, 2026. Counting Day: May 4.
+Data Context: ${JSON.stringify(ELECTION_DATA_2026)}
+
 Structure: 
 1. [DIRECT ANSWER]
 2. [2026 STATUS]
@@ -16,7 +18,6 @@ Structure:
 4. [SOURCE]: ECI Official Bulletins.`;
 
 export default async function handler(req: any, res: any) {
-  // CORS Headers
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,POST');
@@ -26,8 +27,7 @@ export default async function handler(req: any, res: any) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method Not Allowed" });
 
   const apiKey = (process.env.GEMINI_API_KEY || "").trim();
-
-  if (!apiKey || apiKey === "undefined") {
+  if (!apiKey || apiKey === "undefined" || apiKey === "") {
     return res.status(500).json({ 
       error: "SERVER_CONFIG_ERROR", 
       message: "GEMINI_API_KEY is missing from Vercel environment variables." 
@@ -38,53 +38,27 @@ export default async function handler(req: any, res: any) {
     const { message } = req.body;
     if (!message) return res.status(400).json({ error: "VALIDATION_ERROR", message: "No message provided." });
 
-    const genAI = new GoogleGenerativeAI(apiKey);
-    // Explicitly using v1 instead of v1beta to avoid 404s
-    const model = genAI.getGenerativeModel(
-      { model: "gemini-1.5-flash" },
-      { apiVersion: 'v1' }
-    );
+    const ai = new GoogleGenAI({ apiKey });
     
-    // Construct prompt
-    const prompt = `System: ${SYSTEM_PROMPT}\nUser: ${message}`;
-    
-    let result;
-    try {
-      result = await model.generateContent(prompt);
-    } catch (apiError: any) {
-      console.warn("Primary model failed, trying fallback...", apiError);
-      // Fallback to gemini-1.5-pro if flash fails
-      const fallbackModel = genAI.getGenerativeModel({ model: "gemini-1.5-pro" }, { apiVersion: 'v1' });
-      result = await fallbackModel.generateContent(prompt);
-    }
-    
-    const response = await result.response;
-    const text = response.text();
+    const response = await ai.models.generateContent({
+      model: "gemini-3-flash-preview",
+      contents: message,
+      config: {
+        systemInstruction: SYSTEM_PROMPT
+      }
+    });
 
+    const text = response.text;
     if (!text) {
       return res.status(500).json({ error: "AI_EMPTY", message: "The AI returned an empty response." });
     }
 
     return res.status(200).json({ text });
   } catch (error: any) {
-    console.error("Vercel Function Error:", error);
-    
-    // Extract specific API errors
-    let status = 500;
-    let errorType = "AI_SERVER_ERROR";
-    let message = error.message || "Unknown error";
-
-    if (message.includes("API key not valid")) {
-       errorType = "INVALID_API_KEY";
-       message = "The GEMINI_API_KEY provided is invalid. Please check your Vercel Environment Variables.";
-    } else if (message.toLowerCase().includes("quota")) {
-       errorType = "QUOTA_EXCEEDED";
-       message = "Project quota exceeded. Please check your Google AI Studio billing.";
-    }
-
-    return res.status(status).json({ 
-      error: errorType,
-      message: message
+    console.error("Vercel Gemini Error:", error);
+    return res.status(500).json({ 
+      error: "AI_SERVER_ERROR",
+      message: error.message || "An unexpected error occurred during AI processing."
     });
   }
 }
