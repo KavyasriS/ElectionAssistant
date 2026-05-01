@@ -2,7 +2,7 @@ import express from "express";
 import { createServer as createViteServer } from "vite";
 import path from "path";
 import fs from "fs";
-import { GoogleGenerativeAI } from "@google/genai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import dotenv from "dotenv";
 import { ELECTION_DATA_2026 } from "./src/data/election_data";
 
@@ -35,32 +35,38 @@ async function startServer() {
 
   // AI Chat Route
   app.post("/api/chat", async (req, res) => {
-    const { message } = req.body;
-    const apiKey = process.env.GEMINI_API_KEY;
-
-    if (!apiKey) {
-      return res.status(500).json({ error: "MISSING_API_KEY: Gemini API Key is not configured on the server." });
-    }
-
     try {
+      const { message } = req.body;
+      const apiKey = process.env.GEMINI_API_KEY;
+
+      if (!apiKey) {
+        console.error("Gemini API Key is missing in process.env");
+        return res.status(500).json({ 
+          error: "CONFIGURATION_ERROR", 
+          message: "Gemini API Key is not configured on the server." 
+        });
+      }
+
       const genAI = new GoogleGenerativeAI(apiKey);
       const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
       
-      const prompt = `${SYSTEM_PROMPT}\n\nTODAY'S DATE: April 30, 2026\nCONTEXT DATA: ${JSON.stringify(ELECTION_DATA_2026)}\n\nUSER QUESTION: ${message}`;
-      const result = await model.generateContent(prompt);
+      const fullPrompt = `${SYSTEM_PROMPT}\n\nTODAY'S DATE: April 30, 2026\nCONTEXT DATA: ${JSON.stringify(ELECTION_DATA_2026)}\n\nUSER QUESTION: ${message}`;
+      
+      const result = await model.generateContent(fullPrompt);
       const response = await result.response;
       const text = response.text();
 
       if (!text) {
-        throw new Error("AI returned an empty or invalid response.");
+        throw new Error("Empty response from AI model.");
       }
 
-      res.json({ text });
+      return res.json({ text });
     } catch (error: any) {
       console.error("Gemini Server Error:", error);
-      res.status(500).json({ 
-        error: `GEMINI_SERVICE_ERROR: ${error.message || "Unknown AI error"}`,
-        details: error.toString()
+      return res.status(500).json({ 
+        error: "AI_SERVICE_ERROR",
+        message: error.message || "Failed to fetch AI response.",
+        details: process.env.NODE_ENV !== "production" ? error.stack : undefined
       });
     }
   });

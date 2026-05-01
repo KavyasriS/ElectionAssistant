@@ -45,11 +45,12 @@ export default function CivicAssistant() {
       } else {
         const text = await response.text();
         console.error("Non-JSON response received:", text);
-        throw new Error("SERVER_ERROR: The server returned an invalid response (likely an error page). Please check if the /api/chat route is working.");
+        const statusText = response.statusText || "No status text";
+        throw new Error(`SERVER_ERROR (${response.status} ${statusText}): The server returned an invalid response (likely an error page). This usually happens if the API route is missing or crashing. Please check your deployment logs.`);
       }
 
       if (!response.ok) {
-        throw new Error(data.error || `HTTP_ERROR: ${response.status}`);
+        throw new Error(data.error || data.message || `HTTP_ERROR: ${response.status}`);
       }
 
       setMessages(prev => [...prev, { role: "bot", text: data.text }]);
@@ -58,7 +59,7 @@ export default function CivicAssistant() {
       let displayError = error.message;
 
       if (displayError.includes("MISSING_API_KEY")) {
-        displayError = "Gemini API Key is missing on the server. Please check your Vercel Environment Variables.";
+        displayError = "Gemini API Key is missing on the server. Please check your Environment Variables in the host dashboard.";
       }
 
       setMessages(prev => [...prev, { 
