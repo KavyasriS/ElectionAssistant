@@ -50,21 +50,23 @@ export default function CivicAssistant() {
       }
 
       if (!response.ok) {
-        // Log detailed error from server
-        console.error("Server error data:", data);
-        const errorMsg = data.message || data.error || `HTTP ${response.status}: ${response.statusText}`;
-        throw new Error(errorMsg);
+        // Detailed error extraction
+        const errorData = data || {};
+        const errorMsg = errorData.message || errorData.error || `HTTP ${response.status}`;
+        const errorCode = errorData.error || "CONNECTION_ERROR";
+        
+        throw new Error(`${errorCode}: ${errorMsg}`);
       }
 
       setMessages(prev => [...prev, { role: "bot", text: data.text }]);
     } catch (error: any) {
-      console.error("Chat Interaction Failure:", error);
+      console.error("Assistant Communication Error:", error);
       
       const displayError = error.message;
 
       setMessages(prev => [...prev, { 
         role: "bot", 
-        text: `Diagnostic Error: ${displayError}\n\n(Session: ${new Date().toLocaleTimeString()})` 
+        text: `⚠️ CHAT ERROR\nStatus: ${displayError}\n\nPlease verify your Vercel environment variables and redeploy.` 
       }]);
     } finally {
       setLoading(false);

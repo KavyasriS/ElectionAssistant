@@ -36,25 +36,42 @@ export default async function handler(req: any, res: any) {
 
   try {
     const { message } = req.body;
-    if (!message) throw new Error("MESSAGE_REQUIRED: No message provided in request body.");
+    if (!message) return res.status(400).json({ error: "VALIDATION_ERROR", message: "No message provided." });
 
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     
-    const prompt = `${SYSTEM_PROMPT}\n\nUSER QUESTION: ${message}`;
+    // Construct prompt
+    const prompt = `System: ${SYSTEM_PROMPT}\nUser: ${message}`;
     
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
 
-    if (!text) throw new Error("EMPTY_RESPONSE: AI returned no content.");
+    if (!text) {
+      return res.status(500).json({ error: "AI_EMPTY", message: "The AI returned an empty response." });
+    }
 
     return res.status(200).json({ text });
   } catch (error: any) {
-    console.error("Vercel Gemini Error:", error);
-    return res.status(500).json({ 
-      error: "AI_SERVICE_FAILURE",
-      message: error.message || "An unknown error occurred during AI processing."
+    console.error("Vercel Function Error:", error);
+    
+    // Extract specific API errors
+    let status = 500;
+    let errorType = "AI_SERVER_ERROR";
+    let message = error.message || "Unknown error";
+
+    if (message.includes("API key not valid")) {
+       errorType = "INVALID_API_KEY";
+       message = "The GEMINI_API_KEY provided is invalid. Please check your Vercel Environment Variables.";
+    } else if (message.toLowerCase().includes("quota")) {
+       errorType = "QUOTA_EXCEEDED";
+       message = "Project quota exceeded. Please check your Google AI Studio billing.";
+    }
+
+    return res.status(status).json({ 
+      error: errorType,
+      message: message
     });
   }
 }

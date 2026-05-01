@@ -42,7 +42,7 @@ async function startServer() {
       if (!apiKey || apiKey === "") {
         return res.status(500).json({ 
           error: "MISSING_API_KEY", 
-          message: "API Key is missing in server environment." 
+          message: "API Key is missing in local server environment." 
         });
       }
 
@@ -50,19 +50,18 @@ async function startServer() {
       const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
       
       const fullPrompt = `${SYSTEM_PROMPT}\n\nUSER QUESTION: ${message}`;
-      
       const result = await model.generateContent(fullPrompt);
       const response = await result.response;
       const text = response.text();
 
-      if (!text) throw new Error("EMPTY_AI_RESPONSE");
+      if (!text) return res.status(500).json({ error: "AI_EMPTY", message: "AI returned empty text." });
 
       return res.json({ text });
     } catch (error: any) {
-      console.error("Gemini Server Error:", error);
+      console.error("Local Server API Error:", error);
       return res.status(500).json({ 
         error: "AI_ERROR",
-        message: error.message || "Failed to process AI request"
+        message: error.message || "Failed to process AI request locally"
       });
     }
   });
