@@ -46,7 +46,7 @@ async function startServer() {
       const ai = new GoogleGenAI({ apiKey });
       
       const result = await ai.models.generateContent({
-        model: "gemini-1.5-flash",
+        model: "gemini-3-flash-preview",
         contents: [
           {
             role: "user",
@@ -55,10 +55,14 @@ async function startServer() {
         ]
       });
 
+      if (!result || !result.text) {
+        throw new Error("AI returned an empty response.");
+      }
+
       res.json({ text: result.text });
     } catch (error: any) {
       console.error("Gemini Error:", error);
-      res.status(500).json({ error: "Failed to fetch AI response." });
+      res.status(500).json({ error: `AI_ERROR: ${error.message || "Failed to fetch AI response."}` });
     }
   });
 
