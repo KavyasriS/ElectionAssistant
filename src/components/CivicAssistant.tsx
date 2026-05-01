@@ -66,7 +66,7 @@ export default function CivicAssistant() {
 
       setMessages(prev => [...prev, { 
         role: "bot", 
-        text: `⚠️ CHAT ERROR\nStatus: ${displayError}\n\nPlease verify your Vercel environment variables and redeploy.` 
+        text: `I'm having trouble connecting to the AI brain right now.\n\nDetails: ${displayError.split('[404]')[0].trim()}\n\nTip: Double check that your Gemini API key is active in Google AI Studio.`
       }]);
     } finally {
       setLoading(false);

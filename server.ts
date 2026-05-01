@@ -47,10 +47,23 @@ async function startServer() {
       }
 
       const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      // Explicitly using v1 instead of v1beta to avoid 404s
+      const model = genAI.getGenerativeModel(
+        { model: "gemini-1.5-flash" },
+        { apiVersion: 'v1' }
+      );
       
       const fullPrompt = `${SYSTEM_PROMPT}\n\nUSER QUESTION: ${message}`;
-      const result = await model.generateContent(fullPrompt);
+      
+      let result;
+      try {
+        result = await model.generateContent(fullPrompt);
+      } catch (err: any) {
+        console.warn("Flash model 404 or failure, falling back to Pro...");
+        const fallbackModel = genAI.getGenerativeModel({ model: "gemini-1.5-pro" }, { apiVersion: 'v1' });
+        result = await fallbackModel.generateContent(fullPrompt);
+      }
+      
       const response = await result.response;
       const text = response.text();
 

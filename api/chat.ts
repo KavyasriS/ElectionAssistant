@@ -39,12 +39,25 @@ export default async function handler(req: any, res: any) {
     if (!message) return res.status(400).json({ error: "VALIDATION_ERROR", message: "No message provided." });
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    // Explicitly using v1 instead of v1beta to avoid 404s
+    const model = genAI.getGenerativeModel(
+      { model: "gemini-1.5-flash" },
+      { apiVersion: 'v1' }
+    );
     
     // Construct prompt
     const prompt = `System: ${SYSTEM_PROMPT}\nUser: ${message}`;
     
-    const result = await model.generateContent(prompt);
+    let result;
+    try {
+      result = await model.generateContent(prompt);
+    } catch (apiError: any) {
+      console.warn("Primary model failed, trying fallback...", apiError);
+      // Fallback to gemini-1.5-pro if flash fails
+      const fallbackModel = genAI.getGenerativeModel({ model: "gemini-1.5-pro" }, { apiVersion: 'v1' });
+      result = await fallbackModel.generateContent(prompt);
+    }
+    
     const response = await result.response;
     const text = response.text();
 
