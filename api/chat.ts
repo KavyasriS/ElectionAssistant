@@ -59,8 +59,21 @@ STRICT RESPONSE ARCHITECTURE (ORACLE FRAMEWORK):
 3. [DEEP DIVE]: Provide exactly one "Did You Know?" fact about Indian elections.
 4. [VERIFIED SOURCE]: "Grounded in ECI April 30, 2026 Official Bulletins."`;
 
-export default async function (req: any, res: any) {
-  // Check methodology
+export default async function handler(req: any, res: any) {
+  // Set CORS headers for Vercel
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
+  );
+
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method Not Allowed" });
   }
@@ -69,9 +82,10 @@ export default async function (req: any, res: any) {
   const apiKey = process.env.GEMINI_API_KEY;
 
   if (!apiKey || apiKey === "undefined") {
+    console.error("GEMINI_API_KEY is missing");
     return res.status(500).json({ 
       error: "MISSING_API_KEY", 
-      message: "The GEMINI_API_KEY environment variable is not set on the server." 
+      message: "The GEMINI_API_KEY environment variable is not set on the server. Please add it to your Vercel Dashboard." 
     });
   }
 
@@ -79,7 +93,12 @@ export default async function (req: any, res: any) {
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     
-    const prompt = `${SYSTEM_PROMPT}\n\nDATA: ${JSON.stringify(ELECTION_DATA_2026)}\n\nUSER: ${message}`;
+    // Minimal data for the prompt to save on tokens and complexity
+    const stateSummary = Object.values(ELECTION_DATA_2026.states).map((s: any) => 
+      `${s.name}: ${s.status}, ${s.current_2026_turnout_estimate}`
+    ).join("\n");
+
+    const prompt = `${SYSTEM_PROMPT}\n\nSUMMARY DATA:\n${stateSummary}\n\nUSER QUESTION: ${message}`;
     
     const result = await model.generateContent(prompt);
     const responseData = await result.response;
@@ -91,11 +110,10 @@ export default async function (req: any, res: any) {
 
     return res.status(200).json({ text });
   } catch (error: any) {
-    console.error("Gemini Error:", error);
+    console.error("Gemini Execution Error:", error);
     return res.status(500).json({ 
       error: "AI_EXECUTION_ERROR",
-      message: error.message || "Failed to process AI request",
-      stack: process.env.NODE_ENV === "development" ? error.stack : undefined
+      message: error.message || "Failed to process AI request"
     });
   }
 }

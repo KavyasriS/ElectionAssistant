@@ -50,7 +50,11 @@ async function startServer() {
       const genAI = new GoogleGenerativeAI(apiKey);
       const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
       
-      const fullPrompt = `${SYSTEM_PROMPT}\n\nTODAY'S DATE: April 30, 2026\nCONTEXT DATA: ${JSON.stringify(ELECTION_DATA_2026)}\n\nUSER QUESTION: ${message}`;
+      const stateSummary = Object.values(ELECTION_DATA_2026.states).map((s: any) => 
+        `${s.name}: ${s.status}`
+      ).join("\n");
+      
+      const fullPrompt = `${SYSTEM_PROMPT}\n\nSUMMARY DATA:\n${stateSummary}\n\nUSER QUESTION: ${message}`;
       
       const result = await model.generateContent(fullPrompt);
       const response = await result.response;
@@ -65,8 +69,7 @@ async function startServer() {
       console.error("Gemini Server Error:", error);
       return res.status(500).json({ 
         error: "AI_SERVICE_ERROR",
-        message: error.message || "Failed to fetch AI response.",
-        details: process.env.NODE_ENV !== "production" ? error.stack : undefined
+        message: error.message || "Failed to fetch AI response."
       });
     }
   });
