@@ -1,27 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Send, Loader2 } from "lucide-react";
 import { motion } from "motion/react";
-
-const SYSTEM_PROMPT = `You are the Chief Digital Election Officer (CDEO). 
-Mission: Provide authoritative 2026 Assembly Election stats and civic guidance. 
-
-CURRENT DATE: April 30, 2026.
-STATUS: Polling 100% complete. Counting Day: May 4, 2026 (4 days left).
-
-STRICT RESPONSE ARCHITECTURE (ORACLE FRAMEWORK) - YOU MUST USE THIS STRUCTURE FOR EVERY SINGLE RESPONSE:
-
-1. [DIRECT ANSWER]: Provide the immediate factual answer. Use bullet points for stats or candidate names. Keep it extremely short.
-2. [2026 STATUS UPDATE]: State one sentence confirming polling is complete and results are on May 4.
-3. [DEEP DIVE]: Provide exactly one "Did You Know?" fact about Indian elections (e.g. VVPAT, NOTA, Article 324, Sections 49P/49E).
-4. [VERIFIED SOURCE]: "Grounded in ECI April 30, 2026 Official Bulletins."
-
-CORE CONTEXT (FINAL FIGURES):
-- TN: 85.15% turnout (Highest ever). Key: MK Stalin (DMK), Edappadi Palaniswami (AIADMK), Thalapathy Vijay (TVK), K Annamalai (BJP).
-- WB: 92.9% turnout (Overall record). Key: Mamata Banerjee (AITC), Suvendu Adhikari (BJP).
-- KERALA: 73.9%. Key: Pinarayi Vijayan (CPI-M).
-- ASSAM: 84%. Key: Himanta Biswa Sarma (BJP).
-
-NEUTRALITY: No predictions. Strictly non-partisan. Voice removal: no conversational filler like "Happy to help". Direct facts only.`;
+import { ELECTION_DATA_2026 } from "../data/election_data";
 
 export default function CivicAssistant() {
   const [messages, setMessages] = useState<{ role: "user" | "bot"; text: string }[]>([
@@ -57,18 +37,33 @@ export default function CivicAssistant() {
         body: JSON.stringify({ message: userMessage }),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to fetch AI response");
+      let data;
+      const contentType = response.headers.get("content-type");
+      
+      if (contentType && contentType.includes("application/json")) {
+        data = await response.json();
+      } else {
+        const text = await response.text();
+        console.error("Non-JSON response received:", text);
+        throw new Error("SERVER_ERROR: The server returned an invalid response (likely an error page). Please check if the /api/chat route is working.");
       }
 
-      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || `HTTP_ERROR: ${response.status}`);
+      }
+
       setMessages(prev => [...prev, { role: "bot", text: data.text }]);
     } catch (error: any) {
       console.error("Chat Error:", error);
+      let displayError = error.message;
+
+      if (displayError.includes("MISSING_API_KEY")) {
+        displayError = "Gemini API Key is missing on the server. Please check your Vercel Environment Variables.";
+      }
+
       setMessages(prev => [...prev, { 
         role: "bot", 
-        text: `I encountered an error: ${error.message}. Please ensure the GEMINI_API_KEY is correctly set in the environment variables.` 
+        text: `I encountered an error: ${displayError}` 
       }]);
     } finally {
       setLoading(false);

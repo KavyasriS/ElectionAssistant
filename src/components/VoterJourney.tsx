@@ -89,6 +89,16 @@ export default function VoterJourney() {
   const [selectedState, setSelectedState] = useState<string>("");
   const [isChecklistOpen, setIsChecklistOpen] = useState(false);
 
+  useEffect(() => {
+    console.log("VoterJourney mounted. Data state:", {
+      hasSchedule: !!schedule,
+      hasStates: schedule && !!schedule.states,
+      stateCount: schedule && schedule.states ? Object.keys(schedule.states).length : 0
+    });
+  }, [schedule]);
+
+  const stateEntries = schedule && schedule.states ? Object.entries(schedule.states) : [];
+
   return (
     <div className="p-8 max-w-6xl mx-auto space-y-12">
       {/* Roadmap Header Card */}
@@ -136,7 +146,10 @@ export default function VoterJourney() {
                 className="w-full bg-white text-slate-900 border border-slate-200 p-4 rounded-xl shadow-sm focus:ring-2 focus:ring-brand-amber outline-none cursor-pointer transition-all hover:bg-slate-50 font-medium text-sm"
               >
                 <option value="">Select your State...</option>
-                {schedule && schedule.states && Object.entries(schedule.states).map(([code, details]: any) => (
+                {stateEntries.length === 0 && (
+                  <option disabled>No states loaded</option>
+                )}
+                {stateEntries.map(([code, details]: any) => (
                   <option key={code} value={code}>
                     {details.name}
                   </option>

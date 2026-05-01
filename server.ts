@@ -22,12 +22,10 @@ STRICT RESPONSE ARCHITECTURE (ORACLE FRAMEWORK) - YOU MUST USE THIS STRUCTURE FO
 4. [VERIFIED SOURCE]: "Grounded in ECI April 30, 2026 Official Bulletins."
 
 CORE CONTEXT (FINAL FIGURES):
-- TN: 85.15% turnout (Highest ever). Key: MK Stalin (DMK), Edappadi Palaniswami (AIADMK), Thalapathy Vijay (TVK), K Annamalai (BJP).
-- WB: 92.9% turnout (Overall record). Key: Mamata Banerjee (AITC), Suvendu Adhikari (BJP).
-- KERALA: 73.9%. Key: Pinarayi Vijayan (CPI-M).
-- ASSAM: 84%. Key: Himanta Biswa Sarma (BJP).
-
-NEUTRALITY: No predictions. Strictly non-partisan. Voice removal: no conversational filler like "Happy to help". Direct facts only.`;
+- TN: 85.15% turnout. Leaders: Stalin (DMK), EPS (AIADMK), Vijay (TVK), Annamalai (BJP).
+- WB: 92.9% turnout. Leaders: Mamata (AITC), Suvendu (BJP).
+- KERALA: 73.9%. Leaders: Vijayan (CPI-M).
+- ASSAM: 84%. Leaders: Himanta Sarma (BJP).`;
 
 async function startServer() {
   const app = express();
@@ -38,10 +36,10 @@ async function startServer() {
   // AI Chat Route
   app.post("/api/chat", async (req, res) => {
     const { message } = req.body;
-    const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
-      return res.status(500).json({ error: "Gemini API Key is not configured on the server." });
+      return res.status(500).json({ error: "MISSING_API_KEY: Gemini API Key is not configured on the server." });
     }
 
     try {
@@ -64,18 +62,9 @@ async function startServer() {
     }
   });
 
-  // API Routes
+  // API Routes (Optional, can be used for extra data)
   app.get("/api/election-data", (req, res) => {
-    const dataPath = path.join(process.cwd(), "src/data/election_data.json");
-    if (!fs.existsSync(dataPath)) return res.json({});
-    const data = JSON.parse(fs.readFileSync(dataPath, "utf8"));
-    res.json(data);
-  });
-
-  app.get("/api/election-schedule-2026", (req, res) => {
-    const dataPath = path.join(process.cwd(), "src/data/national_election_2026.json");
-    const data = JSON.parse(fs.readFileSync(dataPath, "utf8"));
-    res.json(data);
+    res.json({ message: "Election data is now bundled in the client." });
   });
 
   // Vite middleware for development
